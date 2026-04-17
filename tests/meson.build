@@ -46,7 +46,6 @@ if get_option('installed_tests')
     output : 'installed-tests.sh',
     configuration : {
       'FUSERMOUNT' : fusermount,
-      'FLATPAK_TRIGGERSDIR' : get_option('prefix') / get_option('datadir') / 'flatpak' / 'triggers',
     },
     install_dir : installed_testdir,
   )
@@ -144,6 +143,7 @@ foreach testcase : c_tests
       libflatpak_common_base_dep,
       libglnx_dep,
       libostree_dep,
+      libsoup_dep,
       libtestlib_dep,
     ] + options.get('extra_dependencies', [])),
     sources : [name + '.c'] + options.get('extra_sources', []),
@@ -208,6 +208,7 @@ executable(
     libflatpak_common_base_dep,
     libglnx_dep,
     libostree_dep,
+    libsoup_dep,
   ],
   include_directories : [common_include_directories],
   install : get_option('installed_tests'),
@@ -227,6 +228,7 @@ executable(
     libtestlib_dep,
     libglnx_dep,
     libostree_dep,
+    libsoup_dep,
   ],
   install : get_option('installed_tests'),
   install_dir : installed_testdir,
@@ -288,21 +290,6 @@ executable(
   install : get_option('installed_tests'),
   install_dir : installed_testdir,
 )
-
-if cc.links('#include <stdio.h>\nint main(void) { printf("test"); return 0; }',
-            args: ['-static'],
-            name: 'static libc')
-  executable(
-    'apply-extra-static',
-    'apply-extra-static.c',
-    install : get_option('installed_tests'),
-    install_dir : installed_testdir,
-    override_options : ['b_sanitize=none'],
-    link_args : ['-static'],
-  )
-else
-  warning('static libc not available, apply-extra-static will be skipped')
-endif
 
 subdir('share/xdg-desktop-portal/portals')
 subdir('services')
@@ -375,7 +362,6 @@ foreach testcase : wrapped_tests
     'test-summaries.sh' : 60,
     'test-unused.sh' : 90,
     'test-update-portal.sh' : 90,
-    'test-extra-data.sh' : 90,
   }.get(script, 30)
 
   is_parallel = {

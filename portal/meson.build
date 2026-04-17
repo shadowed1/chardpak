@@ -29,6 +29,7 @@ executable(
     libflatpak_common_dep,
     libglnx_dep,
     libostree_dep,
+    libsoup_dep,
   ],
   include_directories : [
     include_directories('.'),

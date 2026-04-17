@@ -13,8 +13,6 @@
 #include "can-use-fuse.h"
 #include "testlib.h"
 
-void flatpak_add_all_tests (void);
-
 static char *testdir;
 static char *flatpak_runtimedir;
 static char *flatpak_systemdir;
@@ -1019,7 +1017,7 @@ test_list_refs_in_remotes (void)
       const char *ref_spec = flatpak_ref_format_ref_cached (ref);
       const char *collection_id = flatpak_ref_get_collection_id (ref);
 
-      /* Directly listing a file:/ uri remote returns collection ids for all refs */
+      /* Directly listing a file:/ uri remore returns collection ids for all refs */
       g_assert_nonnull (collection_id);
 
       /* All the main 1 collection ids should have been recorded above */
@@ -5129,8 +5127,6 @@ main (int argc, char *argv[])
   g_test_add_func ("/library/installation-unused-refs", test_installation_unused_refs);
   g_test_add_func ("/library/installation-unused-refs-excludes-pins", test_installation_unused_refs_excludes_pins);
   g_test_add_func ("/library/installation-unused-refs-across-installations", test_installation_unused_refs_across_installations);
-
-  flatpak_add_all_tests ();
 
   global_setup ();
 

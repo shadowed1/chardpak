@@ -13,7 +13,6 @@ import http.server as http_server
 
 repositories = {}
 icons = {}
-signatures = {}
 
 
 def get_index():
@@ -117,15 +116,6 @@ class RequestHandler(http_server.BaseHTTPRequestHandler):
             response = 200
             response_string = icons[self.matches["filename"]]
             response_content_type = "image/png"
-        elif self.check_route("/sig-lookaside/@ref/@sig"):
-            ref = self.matches["ref"]
-            sig = self.matches["sig"]
-            index = int(sig.removeprefix("signature-")) - 1
-            try:
-                response = 200
-                response_string = signatures[ref][index]
-            except (KeyError, IndexError):
-                response = 404
 
         assert isinstance(response, int)
         assert isinstance(response_string, bytes)
@@ -222,20 +212,6 @@ class RequestHandler(http_server.BaseHTTPRequestHandler):
             self.send_response(200)
             self.end_headers()
             return
-        elif self.check_route("/testing-sig/@repo_name/@digest"):
-            repo_name = self.matches["repo_name"]
-            digest = self.matches["digest"]
-            s = self.query["s"][0]
-
-            with open(s, "rb") as f:
-                signature_bytes = f.read()
-
-            digest = digest.replace(":", "=")
-            ref = f"{repo_name}@{digest}"
-            sigs = signatures.setdefault(ref, [])
-            sigs.append(signature_bytes)
-            self.send_response(200)
-            self.end_headers()
         else:
             self.send_response(404)
             self.end_headers()
@@ -265,16 +241,6 @@ class RequestHandler(http_server.BaseHTTPRequestHandler):
                 del manifests[t]
 
             modified()
-            self.send_response(200)
-            self.end_headers()
-            return
-        elif self.check_route("/testing-sig/@repo_name/@digest"):
-            repo_name = self.matches["repo_name"]
-            digest = self.matches["digest"]
-
-            digest = digest.replace(":", "=")
-            ref = f"{repo_name}@{digest}"
-            signatures[ref] = list()
             self.send_response(200)
             self.end_headers()
             return

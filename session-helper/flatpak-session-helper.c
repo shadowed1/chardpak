@@ -563,15 +563,12 @@ static void file_changed (GFileMonitor     *monitor,
 static void
 update_real_monitor (MonitorData *data)
 {
-  char *real = NULL;
-  g_autoptr(GError) error = NULL;
-
-  real = flatpak_realpath (data->source, &error);
+  char *real = realpath (data->source, NULL);
 
   if (real == NULL)
     {
       g_info ("unable to get real path to monitor host file %s: %s", data->source,
-              error->message);
+              g_strerror (errno));
       return;
     }
 
@@ -789,7 +786,7 @@ main (int    argc,
                          m_localtime = NULL;
   struct sigaction action;
 
-  /* Save the environment before changing anything, so that subprocesses
+  /* Save the enviroment before changing anything, so that subprocesses
    * can get the unchanged version */
   original_environ = g_get_environ ();
 
